@@ -1,0 +1,4 @@
+/* eslint-disable */
+<template>
+  <p>{{$route.params.token}}</p>
+</template>
