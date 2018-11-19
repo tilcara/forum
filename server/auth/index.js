@@ -3,18 +3,28 @@
 const passport = require('passport');
 const express = require('express');
 
+const {create} = require('./utils');
 const router = express.Router();
 
 require('../passport/google');
 
 router.get('/google',
-    passport.authenticate('google', { scope: ['profile','email'] }));
+	passport.authenticate('google', { 
+		scope: ['profile','email'] 
+}));
 
-router.get('/google/callback',
-    passport.authenticate('google', { failureRedirect: '/login' }),
-     (req, res) => {
-        // Successful authentication, redirect home.
-        res.redirect('/');
-    });
+router.get('/google/callback', (req, res, next) => {
+	passport.authenticate('google', async (err, user) => { 
+		if (err) { return next (err); }
+		try{
+			console.log('creating token with', user);
+			const token = await create(user);
+			res.json({ token });
+		}catch(error){
+			next(error);
+		}
+		
+})(req, res, next);			
+});
 
-    module.exports = router;
+module.exports = router;
